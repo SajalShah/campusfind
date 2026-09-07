@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #f5f4ef;
+  color: #1c2531;
+}
+
+/* Claim-ticket card: a small punch-hole notch and a dashed tear edge,
+   evoking a physical lost-and-found tag rather than a generic SaaS card. */
+.ticket {
+  position: relative;
+  background: #fff;
+  border: 1px solid #d8d4c8;
+  border-radius: 4px;
+}
+
+.ticket::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  background: #f5f4ef;
+  border: 1px solid #d8d4c8;
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.ticket-perforation {
+  border-top: 1px dashed #d8d4c8;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid #b5883a;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

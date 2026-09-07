@@ -1,0 +1,70 @@
+# Query: createClient()
+# ContextLines: 1
+
+14 results - 13 files
+
+.next/dev/server/chunks/ssr/[root-of-the-server]__0ybgd79._.js:
+  254  ;
+  255: async function createClient() {
+  256      const cookieStore = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cookies"])();
+
+.next/dev/server/chunks/ssr/[root-of-the-server]__0ybgd79._.js.map:
+   9      {"offset": {"line": 60, "column": 0}, "map": {"version":3,"sources":["file:///Users/saj/Desktop/campusfind-nextjs/app/layout.tsx"],"sourcesContent":["import type { Metadata } from \"next\";\nimport { Source_Serif_4, IBM_Plex_Sans } from \"next/font/google\";\nimport Navbar from \"@/components/Navbar\";\nimport \"./globals.css\";\n\nconst heading = Source_Serif_4({\n  subsets: [\"latin\"],\n  weight: [\"500\", \"600\", \"700\"],\n  variable: \"--font-heading\",\n});\n\nconst body = IBM_Plex_Sans({\n  subsets: [\"latin\"],\n  weight: [\"400\", \"500\", \"600\"],\n  variable: \"--font-body\",\n});\n\nexport const metadata: Metadata = {\n  title: \"CampusFind\",\n  description: \"Lost something on campus? Found something? Log it here.\",\n};\n\nexport default function RootLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <html lang=\"en\" className={`${heading.variable} ${body.variable}`}>\n      <body className=\"font-sans min-h-screen flex flex-col\">\n        <Navbar />\n        <main className=\"flex-1\">{children}</main>\n        <footer className=\"border-t border-line py-6 mt-12\">\n          <p className=\"max-w-5xl mx-auto px-6 text-sm text-ink-soft\">\n            CampusFind — every report, match and claim is logged and emailed\n            for your records.\n          </p>\n        </footer>\n      </body>\n    </html>\n  );\n}\n"],"names":["metadata","title","description","RootLayout","children","lang","className","variable"],"mappings":";;;;;;;;;AAEA;;;;;;AAeO,MAAMA,WAAqB;IAChCC,OAAO;IACPC,aAAa;AACf;AAEe,SAASC,WAAW,EACjCC,QAAQ,EAGT;IACC,qBACE,8OAAC;QAAKC,MAAK;QAAKC,WAAW,GAAG,6JAAO,CAACC,QAAQ,CAAC,CAAC,EAAE,4JAAI,CAACA,QAAQ,EAAE;kBAC/D,cAAA,8OAAC;YAAKD,WAAU;;8BACd,8OAAC,gIAAM;;;;;8BACP,8OAAC;oBAAKA,WAAU;8BAAUF;;;;;;8BAC1B,8OAAC;oBAAOE,WAAU;8BAChB,cAAA,8OAAC;wBAAEA,WAAU;kCAA+C;;;;;;;;;;;;;;;;;;;;;;AAQtE"}},
+  10:     {"offset": {"line": 134, "column": 0}, "map": {"version":3,"sources":["file:///Users/saj/Desktop/campusfind-nextjs/components/Navbar.tsx"],"sourcesContent":["import Link from \"next/link\";\nimport { createClient } from \"@/lib/supabase/server\";\n\nexport default async function Navbar() {\n  const supabase = await createClient();\n  const {\n    data: { user },\n  } = await supabase.auth.getUser();\n\n  return (\n    <header className=\"border-b border-line bg-paper\">\n      <div className=\"max-w-5xl mx-auto px-6 h-16 flex items-center justify-between\">\n        <Link href=\"/\" className=\"font-serif text-xl font-600 text-ink\">\n          CampusFind\n        </Link>\n        <nav className=\"flex items-center gap-6 text-sm\">\n          <Link href=\"/browse\" className=\"text-ink-soft hover:text-ink\">\n            Browse\n          </Link>\n          {user ? (\n            <>\n              <Link href=\"/report\" className=\"text-ink-soft hover:text-ink\">\n                Report an item\n              </Link>\n              <Link href=\"/my-reports\" className=\"text-ink-soft hover:text-ink\">\n                My reports\n              </Link>\n              <form action=\"/auth/sign-out\" method=\"post\">\n                <button className=\"text-ink-soft hover:text-ink focus-ring\">\n  
+  11:     {"offset": {"line": 245, "column": 0}, "map": {"version":3,"sources":["file:///Users/saj/Desktop/campusfind-nextjs/lib/supabase/server.ts"],"sourcesContent":["import { createServerClient } from \"@supabase/ssr\";\nimport { cookies } from \"next/headers\";\n\nexport async function createClient() {\n  const cookieStore = await cookies();\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll();\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            );\n          } catch {\n            // called from a Server Component with no write access — safe to ignore\n          }\n        },\n      },\n    }\n  );\n}"],"names":["createClient","cookieStore","cookies","getAll","setAll","cookiesToSet","forEach","name","value","options","set"],"mappings":";;;;AAAA;AAAA;AACA;;;AAEO,eAAeA;IACpB,MAAMC,cAAc,MAAM,IAAA,0IAAO;IAEjC,OAAO,IAAA,+LAAkB,oKAGvB;QACEC,SAAS;YACPC;gBACE,OAAOF,YAAYE,MAAM;YAC3B;YACAC,QAAOC,YAAY;gBACjB,IAAI;oBACFA,aAAaC,OAAO,CAAC,CAAC,EAAEC,IAAI,EAAEC,KAAK,EAAEC,OAAO,EAAE,GAC5CR,YA
+  12  }
+
+app/admin/page.tsx:
+  4  export default async function AdminPage() {
+  5:   const supabase = await createClient();
+  6    const {
+
+app/admin/audit-log/page.tsx:
+  4  export default async function AuditLogPage() {
+  5:   const supabase = await createClient();
+  6    const {
+
+app/auth/sign-out/route.ts:
+  4  export async function POST(request: Request) {
+  5:   const supabase = await createClient();
+  6    await supabase.auth.signOut();
+
+app/browse/page.tsx:
+   9    const type = searchParams.type === "found" ? "found" : "lost";
+  10:   const supabase = await createClient();
+  11  
+
+app/login/page.tsx:
+  11    const router = useRouter();
+  12:   const supabase = await createClient();
+  13  
+
+app/my-reports/page.tsx:
+  5  export default async function MyReportsPage() {
+  6:   const supabase = await createClient();
+  7    const {
+
+app/report/page.tsx:
+  19    const router = useRouter();
+  20:   const supabase = await createClient();
+  21  
+
+app/verify/page.tsx:
+  13    const router = useRouter();
+  14:   const supabase = await createClient();
+  15  
+
+components/Navbar.tsx:
+  4  export default async function Navbar() {
+  5:   const supabase = await createClient();
+  6    const {
+
+lib/supabase/client.ts:
+  2  
+  3: export function createClient() {
+  4    return createBrowserClient(
+
+lib/supabase/server.ts:
+  3  
+  4: export async function createClient() {
+  5    const cookieStore = await cookies();
