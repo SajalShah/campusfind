@@ -31,7 +31,7 @@ export default function ReviewHistoryRow({
       >
         <div className="flex items-center gap-6 text-sm">
           <span className="text-ink-soft whitespace-nowrap">
-            {new Date(resolvedAt).toLocaleString()}
+            {new Date(resolvedAt).toLocaleString("en-AU")}
           </span>
           <span className="text-ink-soft">by {adminName}</span>
           <span className="font-medium text-brass-dark">{score}</span>

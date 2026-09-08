@@ -117,7 +117,7 @@ export default async function AdminPage() {
                   <td className="py-3 pr-4 font-mono text-xs">{m.lost_report_id.slice(0, 8)}</td>
                   <td className="py-3 pr-4 font-mono text-xs">{m.found_report_id.slice(0, 8)}</td>
                   <td className="py-3 text-ink-soft whitespace-nowrap">
-                    {new Date(m.created_at).toLocaleString()}
+                    {new Date(m.created_at).toLocaleString("en-AU")}
                   </td>
                 </tr>
               ))}

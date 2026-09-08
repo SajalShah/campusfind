@@ -48,7 +48,7 @@ export default async function NotificationsPage() {
                 )}
               </div>
               <p className="text-xs text-ink-soft mt-2">
-                {new Date(n.created_at).toLocaleString()}
+                {new Date(n.created_at).toLocaleString("en-AU")}
               </p>
             </div>
           ))

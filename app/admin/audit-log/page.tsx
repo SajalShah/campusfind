@@ -42,7 +42,7 @@ export default async function AuditLogPage() {
           {logs?.map((log) => (
             <tr key={log.id} className="border-b border-line/60 align-top">
               <td className="py-3 text-ink-soft whitespace-nowrap">
-                {new Date(log.created_at).toLocaleString()}
+                {new Date(log.created_at).toLocaleString("en-AU")}
               </td>
               <td className="py-3">{log.action}</td>
               <td className="py-3 font-mono text-xs">

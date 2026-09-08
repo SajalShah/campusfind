@@ -77,7 +77,7 @@ export default function ItemTag({ item }: { item: Item }) {
           <div className="flex gap-2">
             <dt className="text-ink-soft w-20 shrink-0">Reported</dt>
             <dd className="text-ink">
-              {new Date(item.date_occurred).toLocaleDateString()}
+              {new Date(item.date_occurred).toLocaleDateString("en-AU")}
             </dd>
           </div>
           <div className="flex gap-2">
