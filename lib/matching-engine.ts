@@ -5,6 +5,8 @@
  *   Found A -> 99.94   Found B -> 88.76
  */
 
+import { cosineSimilarity } from "./embeddings";
+
 export interface ItemReport {
   id: string;
   type: "lost" | "found";
@@ -13,6 +15,8 @@ export interface ItemReport {
   location: string;
   date_occurred: string; // ISO date
   colour?: string | null;
+  /** MiniLM (all-MiniLM-L6-v2) embedding of `description`, if computed. */
+  description_embedding?: number[] | null;
 }
 
 const WEIGHTS = {
@@ -45,10 +49,10 @@ function categoryScore(a: string, b: string): number {
   return a.trim().toLowerCase() === b.trim().toLowerCase() ? 1 : 0;
 }
 
-// Simple token-overlap similarity (Jaccard). Swap for the MiniLM embedding
-// cosine-similarity call here once that pipeline is wired to production —
-// same 0..1 contract, so nothing else in this file needs to change.
-function descriptionScore(a: string, b: string): number {
+// Fallback when one or both reports don't have a computed embedding yet
+// (e.g. the embed API call hasn't completed). Real scoring uses MiniLM
+// cosine similarity instead — see descriptionScore() below.
+function jaccardFallback(a: string, b: string): number {
   const tokenize = (s: string) =>
     new Set(
       s
@@ -102,7 +106,12 @@ export interface MatchBreakdown {
 
 export function scoreMatch(lost: ItemReport, found: ItemReport): MatchBreakdown {
   const cat = categoryScore(lost.category, found.category);
-  const desc = descriptionScore(lost.description, found.description);
+
+  const desc =
+    lost.description_embedding && found.description_embedding
+      ? cosineSimilarity(lost.description_embedding, found.description_embedding)
+      : jaccardFallback(lost.description, found.description);
+
   const loc = locationScore(lost.location, found.location);
   const date = dateScore(lost.date_occurred, found.date_occurred);
   const colour = colourScore(lost.colour, found.colour);

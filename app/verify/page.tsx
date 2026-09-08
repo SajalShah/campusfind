@@ -51,7 +51,7 @@ export default function VerifyPage() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="12345678"
-          className="w-full border border-line rounded-tag px-3 py-3 text-center text-2xl tracking-[0.4em] focus-ring"
+          className="w-full border border-line rounded-tag px-3 py-3 text-center text-2xl tracking-[0.3em] focus-ring"
         />
 
         {error && <p className="text-sm text-lost">{error}</p>}

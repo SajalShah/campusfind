@@ -24,11 +24,5 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.2"
-  },
-  "allowScripts": {
-    "sharp@0.32.6": true,
-    "sharp@0.35.4": true,
-    "fsevents@2.3.3": true,
-    "protobufjs@6.11.6": true
   }
 }
