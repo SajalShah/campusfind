@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { embedText, toVectorLiteral } from "@/lib/embeddings";
 
+// Default serverless timeout (10s) isn't enough for a cold-start model load.
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const { reportId } = await request.json();
   if (!reportId) {

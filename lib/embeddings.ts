@@ -1,4 +1,11 @@
-import { pipeline, type FeatureExtractionPipeline } from "@xenova/transformers";
+import { pipeline, env, type FeatureExtractionPipeline } from "@xenova/transformers";
+
+// Vercel's serverless functions have a read-only filesystem except for
+// /tmp — without this, transformers.js tries to write its downloaded
+// model cache to the project directory and fails in production (works
+// fine locally, where the whole filesystem is writable).
+env.cacheDir = "/tmp/.transformers-cache";
+env.allowLocalModels = false;
 
 // Same model as Capstone 1: sentence-transformers/all-MiniLM-L6-v2 (384-dim).
 // This runs entirely locally via ONNX/WASM — no external API calls, no

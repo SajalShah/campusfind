@@ -4,6 +4,11 @@ import { scoreMatch, type ItemReport } from "@/lib/matching-engine";
 import { embedText, toVectorLiteral } from "@/lib/embeddings";
 import { notifyMatchedParties } from "@/lib/notify-match";
 
+// Default serverless timeout (10s) isn't enough for a cold-start model
+// load plus scoring multiple pairs. 60s is the max Vercel's Hobby tier
+// allows for a Node serverless function.
+export const maxDuration = 60;
+
 // Only compare against reports that are still actively open.
 const OPEN_STATUSES = ["submitted", "under_review", "pending_verification"];
 
