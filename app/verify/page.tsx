@@ -46,11 +46,11 @@ export default function VerifyPage() {
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          maxLength={6}
+          maxLength={8}
           required
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="123456"
+          placeholder="12345678"
           className="w-full border border-line rounded-tag px-3 py-3 text-center text-2xl tracking-[0.4em] focus-ring"
         />
 

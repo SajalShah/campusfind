@@ -28,14 +28,14 @@ Deno.serve(async (req) => {
     if (entity_type === "item_reports") {
       const { data: report } = await supabaseAdmin
         .from("item_reports")
-        .select("id, type, category, description, user_id, users(email)")
+        .select("id, report_type, category, description, reporter_id, users(university_email)")
         .eq("id", entity_id)
         .single();
 
-      toEmail = (report as any)?.users?.email ?? null;
-      subject = `CampusFind: your ${report?.type} report was logged`;
+      toEmail = (report as any)?.users?.university_email ?? null;
+      subject = `CampusFind: your ${report?.report_type} report was logged`;
       bodyHtml = `
-        <p>This confirms your ${report?.type} report (ref CF-${report?.id?.slice(0, 8)}) was logged on CampusFind.</p>
+        <p>This confirms your ${report?.report_type} report (ref CF-${report?.id?.slice(0, 8)}) was logged on CampusFind.</p>
         <p><strong>Category:</strong> ${report?.category}<br/>
         <strong>Description:</strong> ${report?.description}</p>
         <p>Keep this email as a timestamped record.</p>
@@ -46,12 +46,12 @@ Deno.serve(async (req) => {
       const { data: match } = await supabaseAdmin
         .from("match_suggestions")
         .select(
-          "id, total_score, lost_report_id, found_report_id, item_reports!match_suggestions_lost_report_id_fkey(user_id, users(email))"
+          "id, total_score, lost_report_id, found_report_id, item_reports!match_suggestions_lost_report_id_fkey(reporter_id, users(university_email))"
         )
         .eq("id", entity_id)
         .single();
 
-      toEmail = (match as any)?.item_reports?.users?.email ?? null;
+      toEmail = (match as any)?.item_reports?.users?.university_email ?? null;
       subject = "CampusFind: a possible match was found";
       bodyHtml = `
         <p>A possible match (score ${match?.total_score}/100) was found for your report.</p>

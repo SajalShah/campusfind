@@ -84,6 +84,11 @@ can replace it — your call.
   does not yet cover "item claimed" — add a third branch in
   `supabase/functions/notify/index.ts` following the same pattern once
   there's a claim-confirmation action in the admin UI.
-- The matching engine still uses token-overlap similarity for descriptions,
-  not the MiniLM embeddings — same as the demo. Swapping it in is a
-  drop-in replacement inside `descriptionScore()` in `lib/matching-engine.ts`.
+- The matching engine now uses real MiniLM (`all-MiniLM-L6-v2`) embeddings
+  for description similarity, run locally via `transformers.js` — same
+  model as the Capstone 1 worked example. Embeddings are computed
+  automatically on report submission (`app/api/embed`) and consumed during
+  scoring (`app/api/match`). A word-overlap fallback in
+  `lib/matching-engine.ts` only kicks in if an embedding is somehow
+  missing (e.g. the embed call failed) — it's a safety net, not the
+  primary path.

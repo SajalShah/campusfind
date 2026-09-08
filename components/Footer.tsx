@@ -19,6 +19,17 @@ export default function Footer() {
             A logged, matched, emailed record for everything lost and found
             on campus.
           </p>
+          <a
+            href="https://www.linkedin.com/in/-sajal-shah/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="inline-flex items-center justify-center w-8 h-8 mt-4 rounded-tag border border-paper/20 text-paper/60 hover:text-paper hover:border-paper/40 transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45z" />
+            </svg>
+          </a>
         </div>
 
         <div>

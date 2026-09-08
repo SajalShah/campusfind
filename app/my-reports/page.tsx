@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ItemTag from "@/components/ItemTag";
+import ClaimButton from "@/components/ClaimButton";
 
 export default async function MyReportsPage() {
   const supabase = await createClient();
@@ -12,11 +13,18 @@ export default async function MyReportsPage() {
 
   // RLS also enforces this at the database layer — this filter is for
   // display ordering, not the security boundary itself.
-  const { data: items } = await supabase
+  const { data: items, error } = await supabase
     .from("item_reports")
-    .select("id, type, category, description, location, date_occurred, colour, status")
-    .eq("user_id", user.id)
-    .order("date_occurred", { ascending: false });
+    .select(
+      "id, type:report_type, category, description, location:campus_location, date_occurred:item_date, colour, status, item_images(storage_path)"
+    )
+    .eq("reporter_id", user.id)
+    .order("item_date", { ascending: false });
+
+  const itemsWithImage = items?.map((item) => ({
+    ...item,
+    image_path: item.item_images?.[0]?.storage_path ?? null,
+  }));
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-14">
@@ -26,9 +34,24 @@ export default async function MyReportsPage() {
         your email as a timestamped record.
       </p>
 
+      {error && (
+        <p className="text-sm text-lost mt-4">
+          Couldn't load your reports: {error.message}
+        </p>
+      )}
+
       <div className="grid md:grid-cols-2 gap-x-8 gap-y-6 mt-8">
-        {items && items.length > 0 ? (
-          items.map((item) => <ItemTag key={item.id} item={item} />)
+        {itemsWithImage && itemsWithImage.length > 0 ? (
+          itemsWithImage.map((item) => (
+            <div key={item.id}>
+              <ItemTag item={item} />
+              {item.status === "submitted" && (
+                <div className="ml-4 mt-2">
+                  <ClaimButton reportId={item.id} />
+                </div>
+              )}
+            </div>
+          ))
         ) : (
           <p className="text-ink-soft text-sm col-span-2">
             You haven't reported anything yet.

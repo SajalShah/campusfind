@@ -8,13 +8,22 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   let isAdmin = false;
+  let unreadCount = 0;
+
   if (user) {
     const { data: profile } = await supabase
       .from("users")
       .select("role")
       .eq("id", user.id)
       .single();
-    isAdmin = profile?.role === "admin";
+    isAdmin = profile?.role === "administrator";
+
+    const { count } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("recipient_id", user.id)
+      .eq("is_read", false);
+    unreadCount = count ?? 0;
   }
 
   return (
@@ -60,11 +69,27 @@ export default async function Navbar() {
 
         <div className="flex items-center gap-4 text-sm shrink-0">
           {user ? (
-            <form action="/auth/sign-out" method="post">
-              <button className="text-paper/70 hover:text-paper focus-ring">
-                Sign out
-              </button>
-            </form>
+            <>
+              <Link href="/notifications" className="relative text-paper/70 hover:text-paper" aria-label="Notifications">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 01-3.46 0" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-lost text-paper text-[10px] font-medium rounded-full w-4 h-4 flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+              <Link href="/profile" className="text-paper/70 hover:text-paper">
+                Profile
+              </Link>
+              <form action="/auth/sign-out" method="post">
+                <button className="text-paper/70 hover:text-paper focus-ring">
+                  Sign out
+                </button>
+              </form>
+            </>
           ) : (
             <Link
               href="/login"

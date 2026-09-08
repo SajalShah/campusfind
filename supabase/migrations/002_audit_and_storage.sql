@@ -24,7 +24,7 @@ alter table public.audit_log enable row level security;
 create policy "Admins can read audit log"
   on public.audit_log for select
   using (
-    exists (select 1 from public.users u where u.id = auth.uid() and u.role = 'admin')
+    exists (select 1 from public.users u where u.id = auth.uid() and u.role = 'administrator')
   );
 
 -- Inserts happen via the service role from the notify function / triggers,
