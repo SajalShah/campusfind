@@ -88,7 +88,7 @@ export default async function MessageThreadPage({
         )}
       </div>
 
-      <SendMessageBox matchId={matchId} />
+      <SendMessageBox matchId={matchId} hasMessages={!!messages && messages.length > 0} />
     </div>
   );
 }

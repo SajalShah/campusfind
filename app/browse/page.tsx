@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ItemTag from "@/components/ItemTag";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -10,17 +11,22 @@ export default async function BrowsePage({
 }: {
   searchParams: Promise<{ type?: string; category?: string; q?: string }>;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/browse");
+
   const params = await searchParams;
   const tab: Tab =
     params.type === "found" ? "found" : params.type === "claimed" ? "claimed" : "lost";
   const category = params.category ?? "";
   const q = params.q ?? "";
-  const supabase = await createClient();
 
   let query = supabase
     .from("item_reports")
     .select(
-      "id, type:report_type, category, description, location:campus_location, date_occurred:item_date, colour, status, item_images(storage_path)"
+      "id, type:report_type, category, description, location:campus_location, date_occurred:item_date, colour, status, reporter_id, item_images(storage_path)"
     )
     .order("item_date", { ascending: false });
 
@@ -34,9 +40,57 @@ export default async function BrowsePage({
 
   const { data: items, error } = await query;
 
-  const itemsWithImage = items?.map((item) => ({
+  // Reporter names — a narrow public_profiles view (id, full_name only)
+  // so we never expose email/student_id/role on a public listing.
+  const reporterIds = [...new Set((items ?? []).map((i) => i.reporter_id).filter(Boolean))];
+  const { data: profiles } = reporterIds.length
+    ? await supabase.from("public_profiles").select("id, full_name").in("id", reporterIds)
+    : { data: [] };
+  const nameById = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
+
+  // For claimed items, find who the matched counterpart was (claimed
+  // "from" whom) via any confirmed (pursued) match involving this report.
+  let counterpartByReport = new Map<string, string>();
+  if (tab === "claimed" && items && items.length > 0) {
+    const ids = items.map((i) => i.id);
+    const orFilter = ids.map((id) => `lost_report_id.eq.${id},found_report_id.eq.${id}`).join(",");
+    const { data: matches } = await supabase
+      .from("match_suggestions")
+      .select("lost_report_id, found_report_id")
+      .eq("status", "pursued")
+      .or(orFilter);
+
+    const counterpartReportId = new Map<string, string>();
+    for (const m of matches ?? []) {
+      if (ids.includes(m.lost_report_id)) counterpartReportId.set(m.lost_report_id, m.found_report_id);
+      if (ids.includes(m.found_report_id)) counterpartReportId.set(m.found_report_id, m.lost_report_id);
+    }
+    const counterpartIds = [...counterpartReportId.values()];
+    const { data: counterpartReports } = counterpartIds.length
+      ? await supabase.from("item_reports").select("id, reporter_id").in("id", counterpartIds)
+      : { data: [] };
+    const reporterByCounterpartReport = new Map((counterpartReports ?? []).map((r) => [r.id, r.reporter_id]));
+
+    const { data: counterpartProfiles } = counterpartIds.length
+      ? await supabase.from("public_profiles").select("id, full_name").in(
+          "id",
+          [...new Set((counterpartReports ?? []).map((r) => r.reporter_id))]
+        )
+      : { data: [] };
+    const counterpartNameById = new Map((counterpartProfiles ?? []).map((p) => [p.id, p.full_name]));
+
+    for (const [reportId, counterpartReportId2] of counterpartReportId) {
+      const reporterId = reporterByCounterpartReport.get(counterpartReportId2);
+      const name = reporterId ? counterpartNameById.get(reporterId) : null;
+      if (name) counterpartByReport.set(reportId, name);
+    }
+  }
+
+  const itemsWithExtras = items?.map((item) => ({
     ...item,
     image_path: item.item_images?.[0]?.storage_path ?? null,
+    reporterName: item.reporter_id ? nameById.get(item.reporter_id) ?? null : null,
+    claimedFrom: counterpartByReport.get(item.id) ?? null,
   }));
 
   const tabHref = (t: string) => {
@@ -50,8 +104,7 @@ export default async function BrowsePage({
     <div className="max-w-5xl mx-auto px-6 py-14">
       <h1 className="font-serif text-3xl text-ink">Browse items</h1>
       <p className="text-ink-soft text-sm mt-2">
-        See something that's yours? Sign in and it'll be matched
-        automatically against your report.
+        See something that's yours? It'll be matched automatically against your report.
       </p>
 
       <div className="mt-6">
@@ -80,8 +133,8 @@ export default async function BrowsePage({
       )}
 
       <div className="grid md:grid-cols-2 gap-x-8 gap-y-6 mt-8">
-        {itemsWithImage && itemsWithImage.length > 0 ? (
-          itemsWithImage.map((item) => <ItemTag key={item.id} item={item} />)
+        {itemsWithExtras && itemsWithExtras.length > 0 ? (
+          itemsWithExtras.map((item) => <ItemTag key={item.id} item={item} />)
         ) : (
           <p className="text-ink-soft text-sm col-span-2">
             No {tab} items{category ? " in that category" : ""}{q ? ` matching "${q}"` : ""} found.

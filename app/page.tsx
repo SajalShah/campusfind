@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 const FEATURES = [
   {
@@ -28,31 +27,100 @@ const FEATURES = [
   },
 ];
 
+function MockupFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-tag border border-white/10 bg-paper overflow-hidden">
+      <div className="h-8 bg-line/40 flex items-center gap-1.5 px-3">
+        <span className="w-2 h-2 rounded-full bg-lost/60" />
+        <span className="w-2 h-2 rounded-full bg-brass/60" />
+        <span className="w-2 h-2 rounded-full bg-found/60" />
+      </div>
+      <div className="p-5">{children}</div>
+    </div>
+  );
+}
+
+function SignInMockup() {
+  return (
+    <div className="space-y-2.5">
+      <div className="h-9 rounded-tag border border-line bg-white flex items-center justify-center gap-2 text-xs text-ink-soft">
+        <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-brass to-lost" />
+        Continue with Google
+      </div>
+      <div className="flex gap-2">
+        <div className="flex-1 h-7 rounded-tag bg-ink" />
+        <div className="flex-1 h-7 rounded-tag border border-line" />
+      </div>
+      <div className="h-8 rounded-tag border border-line bg-white" />
+      <div className="h-8 rounded-tag border border-line bg-white" />
+      <div className="h-9 rounded-tag bg-ink" />
+    </div>
+  );
+}
+
+function ReportMockup() {
+  return (
+    <div className="space-y-2.5">
+      <div className="flex gap-2">
+        <div className="flex-1 h-8 rounded-tag bg-lost" />
+        <div className="flex-1 h-8 rounded-tag border border-line" />
+      </div>
+      <div className="h-3 w-16 rounded bg-line" />
+      <div className="h-7 rounded-tag border border-line bg-white" />
+      <div className="h-3 w-24 rounded bg-line" />
+      <div className="h-14 rounded-tag border border-line bg-white" />
+      <div className="flex gap-2">
+        <div className="flex-1 h-7 rounded-tag border border-line bg-white" />
+        <div className="flex-1 h-7 rounded-tag border border-line bg-white" />
+      </div>
+    </div>
+  );
+}
+
+function MatchMockup() {
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      <div className="rounded-tag border border-line bg-white p-2.5 space-y-1.5">
+        <span className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded-tag bg-lost-soft text-lost">LOST</span>
+        <div className="h-2 w-3/4 rounded bg-line" />
+        <div className="h-2 w-1/2 rounded bg-line" />
+      </div>
+      <div className="rounded-tag border-2 border-found bg-found-soft p-2.5 space-y-1.5">
+        <span className="inline-block text-[9px] font-medium px-1.5 py-0.5 rounded-tag bg-found text-paper">98% MATCH</span>
+        <div className="h-2 w-3/4 rounded bg-found/30" />
+        <div className="h-2 w-1/2 rounded bg-found/30" />
+      </div>
+    </div>
+  );
+}
+
+function MessageMockup() {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-start">
+        <div className="max-w-[70%] rounded-tag bg-white border border-line px-3 py-2">
+          <div className="h-2 w-24 rounded bg-line" />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <div className="max-w-[70%] rounded-tag bg-ink px-3 py-2">
+          <div className="h-2 w-20 rounded bg-paper/40" />
+        </div>
+      </div>
+      <div className="flex justify-start">
+        <div className="max-w-[70%] rounded-tag bg-white border border-line px-3 py-2">
+          <div className="h-2 w-28 rounded bg-line" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const SHOWCASE = [
-  {
-    title: "Sign in your way",
-    body: "Google OAuth, email + password, or a one-time code — CampusFind supports whichever your campus community actually uses.",
-    img: "/showcase/signin.png",
-    ratio: 1558 / 2940,
-  },
-  {
-    title: "Report in under two minutes",
-    body: "Category, a short description, location and date. A photo helps, but it's never required to submit.",
-    img: "/showcase/report.png",
-    ratio: 1558 / 2940,
-  },
-  {
-    title: "Browse the whole campus",
-    body: "Every open report, searchable and filterable by category — students self-serve instead of visiting a front desk.",
-    img: "/showcase/browse.png",
-    ratio: 1558 / 2940,
-  },
-  {
-    title: "Notified the moment it matches",
-    body: "In-app and by email — delivered even when email itself has an issue, so nobody misses a match.",
-    img: "/showcase/notifications.png",
-    ratio: 670 / 2940,
-  },
+  { title: "Sign in your way", body: "Google OAuth, email + password, or a one-time code — CampusFind supports whichever your campus community actually uses.", mockup: <SignInMockup /> },
+  { title: "Report in under two minutes", body: "Category, a short description, location and date. A photo helps, but it's never required to submit.", mockup: <ReportMockup /> },
+  { title: "Matched automatically", body: "A real AI model scores every open pair — no manual searching, no keyword guesswork.", mockup: <MatchMockup /> },
+  { title: "Coordinate the handoff", body: "Message each other directly in-app once matched — no need to hand out personal contact details.", mockup: <MessageMockup /> },
 ];
 
 export default function HomePage() {
@@ -126,34 +194,20 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* Product showcase — real screenshots of the actual live service */}
+      {/* Product showcase — clean illustrative mockups, not real screenshots */}
       <div className="bg-ink py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <p className="text-brass text-xs font-medium tracking-wide uppercase">See it in action</p>
+          <p className="text-brass text-xs font-medium tracking-wide uppercase">How it works</p>
           <h2 className="font-serif text-3xl text-paper mt-2">
             A complete service, not just a form
           </h2>
-          <p className="text-paper/70 mt-2 max-w-xl">
-            Every screen below is the actual live product — not a mockup.
-          </p>
 
-          <div className="mt-10 space-y-14">
-            {SHOWCASE.map((s, i) => (
-              <div
-                key={s.title}
-                className={`grid md:grid-cols-2 gap-8 items-center ${
-                  i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
-                }`}
-              >
-                <div>
-                  <h3 className="font-serif text-2xl text-paper">{s.title}</h3>
-                  <p className="text-paper/70 mt-3">{s.body}</p>
-                </div>
-                <div className="relative rounded-tag overflow-hidden border border-white/10">
-                  <div className="relative w-full" style={{ aspectRatio: s.ratio }}>
-                    <Image src={s.img} alt={s.title} fill className="object-cover object-top" />
-                  </div>
-                </div>
+          <div className="mt-10 grid sm:grid-cols-2 gap-8">
+            {SHOWCASE.map((s) => (
+              <div key={s.title}>
+                <MockupFrame>{s.mockup}</MockupFrame>
+                <h3 className="font-medium text-paper mt-4">{s.title}</h3>
+                <p className="text-paper/60 text-sm mt-1">{s.body}</p>
               </div>
             ))}
           </div>
