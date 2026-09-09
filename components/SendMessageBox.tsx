@@ -52,6 +52,15 @@ export default function SendMessageBox({
     }
     setBody("");
     router.refresh();
+
+    // Fire-and-forget: notify the recipient by email + in-app. Never
+    // blocks sending — a failed notification shouldn't undo the message,
+    // which already sent successfully above.
+    fetch("/api/messages/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matchId, body: text.trim() }),
+    }).catch(() => {});
   }
 
   return (

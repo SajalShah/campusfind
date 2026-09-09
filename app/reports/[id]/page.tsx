@@ -31,12 +31,24 @@ export default async function ReportDetailPage({
 
   if (error || !report) notFound();
 
-  // Only the owner or an admin can view this — RLS already enforces this
-  // at the database layer for item_reports, but we double-check here too
-  // for a clean redirect instead of a confusing partial page.
+  // Owner, admin, or the other party in a confirmed match involving this
+  // report can view it. RLS (participants_can_read_own_match) already
+  // scopes the match query below to rows the current user is actually
+  // part of — if nothing comes back, they're not a participant.
   const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
   const isAdmin = profile?.role === "administrator";
-  if (report.reporter_id !== user.id && !isAdmin) redirect("/browse");
+  let isMatchParticipant = false;
+  if (report.reporter_id !== user.id && !isAdmin) {
+    const { data: participantMatch } = await supabase
+      .from("match_suggestions")
+      .select("id")
+      .or(`lost_report_id.eq.${id},found_report_id.eq.${id}`)
+      .eq("status", "pursued")
+      .limit(1)
+      .maybeSingle();
+    isMatchParticipant = !!participantMatch;
+  }
+  if (report.reporter_id !== user.id && !isAdmin && !isMatchParticipant) redirect("/browse");
 
   const { data: reporter } = await supabase
     .from("users")
@@ -61,7 +73,7 @@ export default async function ReportDetailPage({
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-14">
-      <a href={isAdmin ? "/admin" : "/my-reports"} className="text-sm text-ink-soft hover:text-ink">
+      <a href={isAdmin ? "/admin" : report.reporter_id === user.id ? "/my-reports" : "/messages"} className="text-sm text-ink-soft hover:text-ink">
         ← Back
       </a>
 
