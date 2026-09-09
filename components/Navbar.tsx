@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Avatar from "@/components/Avatar";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -10,14 +11,18 @@ export default async function Navbar() {
   let isAdmin = false;
   let unreadCount = 0;
   let unreadMessages = 0;
+  let fullName: string | null = null;
+  let avatarColor: string | null = null;
 
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("role")
+      .select("role, full_name, avatar_color")
       .eq("id", user.id)
       .single();
     isAdmin = profile?.role === "administrator";
+    fullName = profile?.full_name ?? null;
+    avatarColor = profile?.avatar_color ?? null;
 
     const { count } = await supabase
       .from("notifications")
@@ -99,8 +104,9 @@ export default async function Navbar() {
                   </span>
                 )}
               </Link>
-              <Link href="/profile" className="text-paper/70 hover:text-paper">
-                Profile
+              <Link href="/profile" className="flex items-center gap-2 text-paper/70 hover:text-paper">
+                <Avatar name={fullName} color={avatarColor} size={26} />
+                <span className="hidden sm:inline">Profile</span>
               </Link>
               <form action="/auth/sign-out" method="post">
                 <button className="text-paper/70 hover:text-paper focus-ring">

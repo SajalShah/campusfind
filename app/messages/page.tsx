@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Avatar from "@/components/Avatar";
 
 export default async function MessagesPage() {
   const supabase = await createClient();
@@ -31,7 +32,8 @@ export default async function MessagesPage() {
     matches = data ?? [];
   }
 
-  // Pull report details + last message for each conversation.
+  // Pull report details, the other party's profile, and last message for
+  // each conversation.
   const conversations = await Promise.all(
     matches.map(async (m) => {
       const isLostSide = myReportIds.includes(m.lost_report_id);
@@ -40,9 +42,17 @@ export default async function MessagesPage() {
 
       const { data: otherReport } = await supabase
         .from("item_reports")
-        .select("category, description")
+        .select("category, description, reporter_id")
         .eq("id", otherReportId)
         .single();
+
+      const { data: otherProfile } = otherReport?.reporter_id
+        ? await supabase
+            .from("public_profiles")
+            .select("full_name, avatar_color")
+            .eq("id", otherReport.reporter_id)
+            .single()
+        : { data: null };
 
       const { data: lastMsg } = await supabase
         .from("messages")
@@ -63,6 +73,7 @@ export default async function MessagesPage() {
         matchId: m.id,
         myReportId,
         otherReport,
+        otherProfile,
         lastMsg,
         unread: unread ?? 0,
       };
@@ -82,12 +93,14 @@ export default async function MessagesPage() {
             <Link
               key={c.matchId}
               href={`/messages/${c.matchId}`}
-              className="ticket ml-4 p-4 flex items-center justify-between gap-4 block hover:bg-line/10 transition-colors"
+              className="ticket ml-4 p-4 flex items-center gap-3 block hover:bg-line/10 transition-colors"
             >
-              <div>
+              <Avatar name={c.otherProfile?.full_name} color={c.otherProfile?.avatar_color} size={40} />
+              <div className="flex-1 min-w-0">
                 <p className="font-medium text-ink">
-                  {c.otherReport?.category ?? "Item"}
+                  {c.otherProfile?.full_name || "Matched student"}
                 </p>
+                <p className="text-xs text-ink-soft">{c.otherReport?.category}</p>
                 <p className="text-sm text-ink-soft mt-0.5 line-clamp-1">
                   {c.lastMsg?.body ?? "No messages yet — say hello!"}
                 </p>

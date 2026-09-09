@@ -73,14 +73,27 @@ export default function ItemTag({ item }: { item: Item }) {
         <h3 className="font-serif text-lg text-ink mt-1 leading-tight">
           {formatLabel(item.category)}
         </h3>
-        <p className="text-sm text-ink mt-1 line-clamp-2">{item.description}</p>
 
-        {/* Tight metadata row instead of stacked label/value pairs */}
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-soft mt-2">
-          <span>📍 {item.location}</span>
-          <span>{new Date(item.date_occurred).toLocaleDateString("en-AU")}</span>
-          {item.colour && <span>{item.colour}</span>}
-        </div>
+        <dl className="mt-2 space-y-1 text-sm">
+          <div className="flex gap-2">
+            <dt className="text-ink-soft w-20 shrink-0">Description</dt>
+            <dd className="text-ink">{item.description}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="text-ink-soft w-20 shrink-0">Location</dt>
+            <dd className="text-ink">{item.location}</dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="text-ink-soft w-20 shrink-0">Reported</dt>
+            <dd className="text-ink">
+              {new Date(item.date_occurred).toLocaleDateString("en-AU")}
+            </dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="text-ink-soft w-20 shrink-0">Colour</dt>
+            <dd className="text-ink">{item.colour}</dd>
+          </div>
+        </dl>
 
         {item.reporterName && (
           <p className="text-xs text-ink-soft mt-2 border-t border-line pt-2">

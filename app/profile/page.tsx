@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Avatar, { AVATAR_COLORS } from "@/components/Avatar";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [studentId, setStudentId] = useState("");
+  const [avatarColor, setAvatarColor] = useState<string | null>(null);
   const [role, setRole] = useState<string>("student");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,13 +38,14 @@ export default function ProfilePage() {
 
       const { data: profile } = await supabase
         .from("users")
-        .select("full_name, student_id, role")
+        .select("full_name, student_id, role, avatar_color")
         .eq("id", user.id)
         .single();
 
       setFullName(profile?.full_name ?? "");
       setStudentId(profile?.student_id ?? "");
       setRole(profile?.role ?? "student");
+      setAvatarColor(profile?.avatar_color ?? null);
       setLoading(false);
     }
     loadProfile();
@@ -66,7 +69,7 @@ export default function ProfilePage() {
 
     const { error: updateError } = await supabase
       .from("users")
-      .update({ full_name: fullName, student_id: studentId })
+      .update({ full_name: fullName, student_id: studentId, avatar_color: avatarColor })
       .eq("id", user.id);
 
     setSaving(false);
@@ -96,6 +99,33 @@ export default function ProfilePage() {
           Administrator
         </span>
       )}
+
+      <div className="flex items-center gap-4 mt-6">
+        <Avatar name={fullName || email} color={avatarColor} size={56} />
+        <div>
+          <p className="text-sm font-medium text-ink">{fullName || "Your name"}</p>
+          <p className="text-xs text-ink-soft">This is how you'll appear to matched students</p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="text-sm font-medium text-ink">Avatar colour</label>
+        <div className="flex gap-2 mt-2">
+          {AVATAR_COLORS.map((c) => (
+            <button
+              key={c.value}
+              type="button"
+              onClick={() => setAvatarColor(c.value)}
+              className={`w-8 h-8 rounded-full focus-ring ${
+                avatarColor === c.value ? "ring-2 ring-offset-2 ring-ink" : ""
+              }`}
+              style={{ backgroundColor: c.value }}
+              aria-label={c.name}
+              title={c.name}
+            />
+          ))}
+        </div>
+      </div>
 
       <form onSubmit={handleSave} className="mt-8 space-y-5">
         <div>
