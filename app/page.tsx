@@ -1,21 +1,57 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const FEATURES = [
   {
-    title: "Passwordless, logged sign-in",
-    body: "Email OTP replaces the password box entirely — a 6-digit code, every sign-in recorded.",
+    title: "Three ways to sign in",
+    body: "Google, email + password, or a one-time email code — pick whichever's fastest. Google sign-in carries MFA automatically if it's enabled on the account.",
   },
   {
-    title: "Weighted matching engine",
-    body: "Category, description, location, date and colour, each scored and combined into one confidence number.",
+    title: "Real AI matching engine",
+    body: "A genuine sentence-embedding model compares descriptions semantically, weighted alongside category, location, date and colour — not just keyword matching.",
   },
   {
     title: "Photos are optional",
     body: "A good description is enough to start a match. Add a photo when you have one, skip it when you don't.",
   },
   {
-    title: "Every action, emailed",
-    body: "Reports, matches and claims are logged and confirmed by email — a record that outlives the front-desk box.",
+    title: "Direct, private messaging",
+    body: "Once matched, coordinate the handoff in-app — no need to share personal contact details with a stranger.",
+  },
+  {
+    title: "Admin only for real ambiguity",
+    body: "Routine matches resolve themselves automatically. Staff time is reserved for genuine clashes only.",
+  },
+  {
+    title: "Every action, logged",
+    body: "Reports, matches, messages and claims are timestamped and auditable — a record that outlives a front-desk box.",
+  },
+];
+
+const SHOWCASE = [
+  {
+    title: "Sign in your way",
+    body: "Google OAuth, email + password, or a one-time code — CampusFind supports whichever your campus community actually uses.",
+    img: "/showcase/signin.png",
+    ratio: 1558 / 2940,
+  },
+  {
+    title: "Report in under two minutes",
+    body: "Category, a short description, location and date. A photo helps, but it's never required to submit.",
+    img: "/showcase/report.png",
+    ratio: 1558 / 2940,
+  },
+  {
+    title: "Browse the whole campus",
+    body: "Every open report, searchable and filterable by category — students self-serve instead of visiting a front desk.",
+    img: "/showcase/browse.png",
+    ratio: 1558 / 2940,
+  },
+  {
+    title: "Notified the moment it matches",
+    body: "In-app and by email — delivered even when email itself has an issue, so nobody misses a match.",
+    img: "/showcase/notifications.png",
+    ratio: 670 / 2940,
   },
 ];
 
@@ -80,7 +116,7 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6">
-        <section className="py-16 grid sm:grid-cols-2 gap-x-10 gap-y-10">
+        <section className="py-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
           {FEATURES.map((f) => (
             <div key={f.title} className="border-l-2 border-brass pl-5">
               <h3 className="font-medium text-ink">{f.title}</h3>
@@ -88,8 +124,44 @@ export default function HomePage() {
             </div>
           ))}
         </section>
+      </div>
 
-        <section className="py-16 border-t border-line grid md:grid-cols-3 gap-8">
+      {/* Product showcase — real screenshots of the actual live service */}
+      <div className="bg-ink py-16">
+        <div className="max-w-5xl mx-auto px-6">
+          <p className="text-brass text-xs font-medium tracking-wide uppercase">See it in action</p>
+          <h2 className="font-serif text-3xl text-paper mt-2">
+            A complete service, not just a form
+          </h2>
+          <p className="text-paper/70 mt-2 max-w-xl">
+            Every screen below is the actual live product — not a mockup.
+          </p>
+
+          <div className="mt-10 space-y-14">
+            {SHOWCASE.map((s, i) => (
+              <div
+                key={s.title}
+                className={`grid md:grid-cols-2 gap-8 items-center ${
+                  i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                <div>
+                  <h3 className="font-serif text-2xl text-paper">{s.title}</h3>
+                  <p className="text-paper/70 mt-3">{s.body}</p>
+                </div>
+                <div className="relative rounded-tag overflow-hidden border border-white/10">
+                  <div className="relative w-full" style={{ aspectRatio: s.ratio }}>
+                    <Image src={s.img} alt={s.title} fill className="object-cover object-top" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6">
+        <section className="py-16 grid md:grid-cols-3 gap-8">
           <div>
             <p className="font-serif text-3xl text-brass">1</p>
             <h3 className="font-medium mt-2 text-ink">Report</h3>
@@ -104,15 +176,15 @@ export default function HomePage() {
             <p className="text-ink-soft text-sm mt-1">
               The matching engine scores every lost/found pair on category,
               description, location, date and colour, and flags likely
-              matches for an admin to confirm.
+              matches automatically.
             </p>
           </div>
           <div>
             <p className="font-serif text-3xl text-brass">3</p>
             <h3 className="font-medium mt-2 text-ink">Claim</h3>
             <p className="text-ink-soft text-sm mt-1">
-              Once confirmed, both parties get an emailed record — a
-              timestamped proof trail if a dispute ever comes up later.
+              Message each other directly in-app, arrange the handoff, and
+              mark it claimed — a timestamped record either way.
             </p>
           </div>
         </section>

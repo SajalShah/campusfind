@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -45,6 +45,17 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.push("/login?next=/report");
+      } else {
+        setCheckingAuth(false);
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,6 +141,14 @@ export default function ReportPage() {
     setLoading(false);
     setSuccess(true);
     setTimeout(() => router.push("/my-reports"), 1200);
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="max-w-xl mx-auto px-6 py-14">
+        <p className="text-ink-soft text-sm">Checking sign-in…</p>
+      </div>
+    );
   }
 
   return (

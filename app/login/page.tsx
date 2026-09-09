@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "password" | "otp";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = searchParams.get("next") || "/browse";
   const supabase = createClient();
 
   const [mode, setMode] = useState<Mode>("password");
@@ -64,7 +66,7 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push("/browse");
+    router.push(nextUrl);
     router.refresh();
   }
 
@@ -83,7 +85,7 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push(`/verify?email=${encodeURIComponent(email)}`);
+    router.push(`/verify?email=${encodeURIComponent(email)}&next=${encodeURIComponent(nextUrl)}`);
   }
 
   return (

@@ -45,11 +45,12 @@ export default async function MyReportsPage() {
           itemsWithImage.map((item) => (
             <div key={item.id}>
               <ItemTag item={item} />
-              {item.status === "submitted" && (
-                <div className="ml-4 mt-2">
-                  <ClaimButton reportId={item.id} />
-                </div>
-              )}
+              <div className="ml-4 mt-2 flex items-center gap-3">
+                {item.status === "submitted" && <ClaimButton reportId={item.id} />}
+                <a href={`/reports/${item.id}`} className="text-xs text-ink-soft hover:text-ink underline">
+                  View timeline →
+                </a>
+              </div>
             </div>
           ))
         ) : (

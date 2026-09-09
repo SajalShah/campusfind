@@ -113,7 +113,7 @@ export async function POST(request: Request) {
   );
 
   let written = 0;
-  const newlyWritten: { lost: DbReport; found: DbReport; score: number }[] = [];
+  const newlyWritten: { lost: DbReport; found: DbReport; score: number; matchId: string }[] = [];
 
   for (const { lost, found } of pairs) {
     const breakdown = scoreMatch(toEngineFormat(lost), toEngineFormat(found));
@@ -122,24 +122,28 @@ export async function POST(request: Request) {
     const key = `${lost.id}:${found.id}`;
     const isNew = !existingKeys.has(key);
 
-    const { error: upsertError } = await admin.from("match_suggestions").upsert(
-      {
-        lost_report_id: lost.id,
-        found_report_id: found.id,
-        category_score: breakdown.categoryScore,
-        description_score: breakdown.descriptionScore,
-        location_score: breakdown.locationScore,
-        date_score: breakdown.dateScore,
-        colour_score: breakdown.colourScore,
-        total_score: breakdown.totalScore,
-        confidence_band: breakdown.totalScore >= LIKELY_THRESHOLD ? "likely" : "possible",
-      },
-      { onConflict: "lost_report_id,found_report_id" }
-    );
+    const { data: upserted, error: upsertError } = await admin
+      .from("match_suggestions")
+      .upsert(
+        {
+          lost_report_id: lost.id,
+          found_report_id: found.id,
+          category_score: breakdown.categoryScore,
+          description_score: breakdown.descriptionScore,
+          location_score: breakdown.locationScore,
+          date_score: breakdown.dateScore,
+          colour_score: breakdown.colourScore,
+          total_score: breakdown.totalScore,
+          confidence_band: breakdown.totalScore >= LIKELY_THRESHOLD ? "likely" : "possible",
+        },
+        { onConflict: "lost_report_id,found_report_id" }
+      )
+      .select("id")
+      .single();
 
-    if (!upsertError) {
+    if (!upsertError && upserted) {
       written++;
-      if (isNew) newlyWritten.push({ lost, found, score: breakdown.totalScore });
+      if (isNew) newlyWritten.push({ lost, found, score: breakdown.totalScore, matchId: upserted.id });
     }
   }
 
@@ -173,7 +177,7 @@ export async function POST(request: Request) {
   // Notify both reporters directly on every genuinely new, non-clashing
   // match — this is the "students coordinate themselves" path. Clashing
   // matches notify admins instead; an admin resolves those first.
-  for (const { lost, found, score } of newlyWritten) {
+  for (const { lost, found, score, matchId } of newlyWritten) {
     const isClash =
       (lostCounts.get(lost.id) ?? 0) > 1 || (foundCounts.get(found.id) ?? 0) > 1;
 
@@ -198,7 +202,7 @@ export async function POST(request: Request) {
       continue;
     }
 
-    await notifyMatchedParties(admin, lost, found, score);
+    await notifyMatchedParties(admin, lost, found, score, matchId);
   }
 
   return NextResponse.json({

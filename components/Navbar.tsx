@@ -9,6 +9,7 @@ export default async function Navbar() {
 
   let isAdmin = false;
   let unreadCount = 0;
+  let unreadMessages = 0;
 
   if (user) {
     const { data: profile } = await supabase
@@ -24,6 +25,13 @@ export default async function Navbar() {
       .eq("recipient_id", user.id)
       .eq("is_read", false);
     unreadCount = count ?? 0;
+
+    const { count: msgCount } = await supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .neq("sender_id", user.id)
+      .is("read_at", null);
+    unreadMessages = msgCount ?? 0;
   }
 
   return (
@@ -70,6 +78,16 @@ export default async function Navbar() {
         <div className="flex items-center gap-4 text-sm shrink-0">
           {user ? (
             <>
+              <Link href="/messages" className="relative text-paper/70 hover:text-paper" aria-label="Messages">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg>
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-found text-paper text-[10px] font-medium rounded-full w-4 h-4 flex items-center justify-center">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
+                  </span>
+                )}
+              </Link>
               <Link href="/notifications" className="relative text-paper/70 hover:text-paper" aria-label="Notifications">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />

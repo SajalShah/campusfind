@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function VerifyPage() {
   const params = useSearchParams();
   const email = params.get("email") ?? "";
+  const nextUrl = params.get("next") || "/browse";
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export default function VerifyPage() {
       setError(error.message);
       return;
     }
-    router.push("/browse");
+    router.push(nextUrl);
     router.refresh();
   }
 

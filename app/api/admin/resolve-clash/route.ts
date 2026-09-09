@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   ]);
 
   if (lost && found) {
-    await notifyMatchedParties(admin, lost, found, chosen.total_score);
+    await notifyMatchedParties(admin, lost, found, chosen.total_score, chosen.id);
   }
 
   await admin.from("audit_log").insert({
